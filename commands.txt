@@ -1,0 +1,317 @@
+*******************
+*      INFO       *
+*******************
+
+File with short example and comments on GIT.
+https://github.com/nicoben/variabilia/git/git_commands.txt
+
+Author: Nicola Benaglia
+Mail:	nico.benaz@gmail.com
+
+
+
+********************
+*   TERMINOLOGY    *
+********************
+
+Working directory	# set of files of your branch on which you're working on (think of it as a sandbox)
+Staging area 		# files marked to be committed
+HEAD			# pointer to last commit of your branch
+
+
+*************
+*   INIT    *
+*************
+
+git init		# init a repository inside the current directory, .git directory will be created
+
+
+
+***************
+*   ALIASES   *
+***************
+
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+git config --global alias.unstage 'reset HEAD --'
+git config --global alias.last 'log -1 HEAD'
+
+git st
+git last
+
+
+
+*************
+*  GLOBAL   *
+*************
+
+git config --global user.name "John Doe"
+git config --global user.email johndoe@example.com
+git config --global core.editor vim
+git config --list					        # all config properties
+git config user.name					        # show single property
+git help config						        # help command
+
+
+
+*************
+*  CONFIG   *
+*************
+
+[imap]
+folder = "[Gmail]/Drafts"
+host = imaps://imap.gmail.com
+user = user@gmail.com
+pass = p4ssw0rd
+port = 993
+sslverify = false
+
+cat *.patch |git imap-send				        # send patch file to imap folder
+
+[sendemail]
+smtpencryption = tls
+smtpserver = smtp.gmail.com
+smtpuser = user@gmail.com
+smtpserverport = 587
+
+git send-email *.patch					        # send patch file by smtp
+
+git config --global commit.template ~/.gitmessage.txt   	# set a default message for committing
+git config --global color.ui false				# disable colors
+
+
+
+************************
+*  FREQUENT COMMANDS   *
+************************
+
+git add *.c							# add all c-files to staging area
+git add LICENSE							# add this file to staging area
+git add -i							# add with interactive mode menu
+git commit -m 'initial project version'				# commit all files from staging area
+git commit							# open default editor for commit message
+git commit -a							# include all changed files
+
+git clone https://github.com/libgit2/libgit2			# clone a repository (with all history)
+
+git status							# show the status of the directory
+git status --short | -s						# short output
+
+git diff							# compare working dir with staging area
+git diff --staged | --cached					# compare staging area with last commit
+
+git rm file.txt							# remove file.txt
+git rm --cached file.txt					# remove file.txt only from staging area
+git rm log/\*.log						# remove all log files
+
+git mv file_from file_to					# move file
+
+git commit --amend						# add current staging area to the last commit
+git reset HEAD file.txt						# unstage a staged file.txt
+git reset --hard HEAD						# revert to a previous commit, ignoring any changes
+git checkout -- file.txt					# discard changes and take last committed
+
+git grep -n string						# search for string through any committed tree or working directory
+git grep -n string $(git rev-list --all)	# search for string through any revision
+
+git filter-branch --tree-filter 'rm -f password.txt' HEAD	# remove password.txt from the entire history
+
+git blame -L 10,24 my_file.java                                 # show log info from line 10 to 24 of my_file.java (who committed those bugged lines?)
+
+
+
+********************
+*   VIEW HISTORY   *
+********************
+
+git log							# show all history in reverse chronological order
+git log -n						# show only last n commits
+git log -p -2						# show differences introduced with last 2 commits
+git log --stat 						# show abbreviated stats
+git log --abbrev-commit					# show with shorter SHA-1 (7 digits)
+git log --pretty=oneline|short|full|fuller		# show with different output format
+git log --pretty=format:"%h - %an, %ar : %s"		# show with a specified format
+git log --pretty=format:"%h %s" --graph			# show graph of branching and merging
+git log --relative-date					# show with relative date
+git log --since=2.weeks	| --after			# show only last 2 weeks
+git log --until=2.weeks	| --before			# show only before 2 weeks
+git log -Sfunction_name					# show only commits adding or removing code matching the string
+git log --decorate					# show where the branch pointers are pointing
+git log master..experiment				# show all commit in experiment, not reachable in master
+git log master...experiment				# show all commit reachable by either 2, but not by both
+
+git log -L :my_function:my_file.java			# show changes to my_function in my_file.java
+
+git reflog						# show HEAD and branches references for the last few months (only local repository)
+git reflog --date=local my_branch
+git show HEAD@{5}
+git show master@{yesterday}
+git show master@{2.months.ago}
+
+
+
+**********************
+*   FORMAT OPTIONS   *
+**********************
+
+%H  Commit hash
+%h  Abbreviated commit hash
+%T  Tree hash
+%t  Abbreviated tree hash
+%P  Parent hashes
+%p  Abbreviated parent hashes
+%a  Author name
+%ae Author email
+%ad Author date (format respects the --date=option)
+%ar Author date, relative
+%cn Committer name
+%ce Committer email
+%cd Committer date
+%cr Committer date, relative
+%s  Subject
+
+
+
+***************************
+*   REMOTE REPOSITORIES   *
+***************************
+
+git remote -v						# show remote repositories
+git remote add nb https://github.com/nicobenaz/mygit	# add a new remote repository with alias nb
+git fetch nb						# fetch all new info from nb and put it in your local repository
+git pull nb						# fetch and merge all new info in yur current working branch
+git push origin master					# push your master branch to the origin (must have write permissions)
+
+git remote show origin					# inspect remote repository origin
+git remote rename nb nicola				# rename an alias
+git remote rm nicola					# remove a repository
+
+
+
+***************
+*   TAGGING   *
+***************
+
+Two type of tags: 
+- lightweight: 	just a pointer with no detailed metadata
+- annotated: 	store full objects in the database
+
+git tag 						# show tags
+git tag -l "v1.4.2*"					# filter at 1.4.2 versions
+git tag -a v1.2 -m "my version 1.2"			# create annotated tag v1.2 with comment
+git show v1.2						# show tag v1.2
+git show v1.2 -lw					# create lightweight tag v1.2
+git tag -a v1.2 8dbe54					# add commit 8dbe54 to annotated TAGGING
+git push origin v1.2					# push tag to origin
+git push origin --tags					# push all tags to origin
+git checkout -b version2 v2.0.0				# checkout of a specified tag in a specified branch
+
+
+
+****************
+*     MERGE    *
+****************
+
+git merge testing				        # merge testing with your working directory
+git mergetool					        # launch the default visual merge tool to manage conflicts
+git merge --abort                                       # abort merging (undo)
+git merge -Xignore-space-change whitespace              # ignore spaces when merging
+
+git show :1:myFile.java > myFile.common.java            # show and save content from common ancestor (1)
+git show :2:myFile.java > myFile.ours.java              # show and save content from your version (2)
+git show :3:myFile.java > myFile.theirs.java            # show and save content from MERGE_HEAD (3)
+
+git merge-file -p \
+myFile.ours.java myFile.common.java \
+myFile.theirs.java > myFile.java                        # merge all three previous files into one
+
+git diff --ours                                         # see what merge introduced in comparison with your before merge
+git diff --theirs -b                                    # see what merge introduced in comparison with their before merge (-b strips out spaces)
+git diff --base -b                                      # see what merge introduced from both sides
+git clean -f                                            # clean three extra files created before
+
+git log --oneline --left-right HEAD...MERGE_HEAD        # show full list of all of the unique commits included in the current branch
+git reset --hard HEAD~                                  # unmerge to previous point. This solution is not good for shared repositories.
+git revert -m 1 HEAD                                    # revert to previous point. 
+
+
+
+
+
+
+****************
+*   BRANCHES   *
+****************
+
+A branch in Git is simply a lightweight movable pointer to one of previous done commits.
+The default branch name in Git is master, created with init command.
+HEAD is a pointer to the local branch you are currently on.
+With Git managing branches is very simple and rapid, so it is common to create, work on, merge and delete a lot of branches in the same session of work.
+A topic branch is a short-lived branch, created for only one single feature.
+
+git log --decorate				        # show where the branch pointers are pointing
+git branch					        # show list of branches
+git branch -v					        # show last commit of each branch
+git branch --merged | --no-merged                       # show branches merged|notMerged with your current working directory
+git branch testing			                # create a new branch called testing (pointing to current commit), doesn't switch to it.
+git checkout testing				        # switch to testing branch, your working directory will receive testing branch
+git log --oneline --decorate --graph --all	        # see branches situation with graph mode
+git checkout -b abc1.2				        # create branch and switch to it
+git branch -d testing				        # delete branch testing
+
+
+
+
+****************
+*    REMOTE    *
+****************
+
+git ls-remote					# full list of remote repositories
+git remote show					# list of remote references
+git fetch origin				# synch your local repository with origin (remote repository you cloned from)
+git push origin my_branch			# share my_branch with origin repository
+git push origin my_branch:remote_branch		# share my_branch with origin repository and give it remote_branch as name
+
+git checkout -b branchFix origin/branchFix	# take a remote branchFix, call it branchFix and put it in your working directory
+git checkout --track origin/branchFix		# same as above, create a tracking branch, i.e. a local branch related to a remote one
+git branch -u origin/branchFix			# update local existing branch to new oneline (--set-upstream-to | -u)
+git branch -vv					# show branches set up
+git push origin --delete branchFix		# delete a branch from remote
+
+
+
+****************
+*    REBASE    *
+****************
+
+Rebasing is an alternative to merge. It replays changes from one line of work onto another one in the same order they were introduced.
+Merging takes two endpoints and merge them together.
+Warning: do not rebase commits that are already public, because people may have used them in their work.
+
+git rebase master server			# apply server's line of work to master's one
+git rebase -i HEAD~3				# edit last three commits (only for local commits is suggested)
+
+
+****************
+*    STASH     *
+****************
+
+Your partial work can be stashed in a special stack area letting you to change a branch without committing.
+
+git stash					# push a new stash on your stack
+git stash list					# list of your stored stashes
+git stash apply stash@{2}			# apply a stored stash, without specifying a stash, the most recent will be applied.
+git stash drop stash@{2}			# drop a stored stash
+git stash pop stash@{2}				# apply and drop a stored stash
+git stash --keep-index				# stash only not previously staged files (with 'git add' command)
+git stash --include-untracked			# stash also untracked files (by default git only store file already in the index)
+git stash branch my_branch			# create a new branch, apply and drop stash work
+git stash --all					# remove every stash work (alternative: git clean)
+
+
+
+
+
+
