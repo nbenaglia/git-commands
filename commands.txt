@@ -3,12 +3,6 @@
 *******************
 
 File with short example and comments on GIT.
-https://github.com/nicoben/variabilia/git/git_commands.txt
-
-Author: Nicola Benaglia
-Mail:	nico.benaz@gmail.com
-
-
 
 ********************
 *   TERMINOLOGY    *
